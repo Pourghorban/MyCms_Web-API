@@ -1,15 +1,11 @@
 ﻿using AutoMapper;
 using MediatR;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using MyCmsWebApi2.Applications.Commands.CommentsCommand;
 using MyCmsWebApi2.Applications.Repository;
 using MyCmsWebApi2.Domain.Entities;
 using MyCmsWebApi2.Infrastructure.Extensions;
-using MyCmsWebApi2.Presentations.Controllers.AdminControllers;
-using MyCmsWebApi2.Presentations.Dtos.CommentsDto.Admin;
 using MyCmsWebApi2.Presentations.Dtos.CommentsDto.User;
-using MyCmsWebApi2.Presentations.Dtos.NewsDto.Admin;
 using MyCmsWebApi2.Presentations.QueryFacade;
 
 namespace MyCmsWebApi2.Presentations.Dtos.NewsDto.Users

@@ -1,11 +1,15 @@
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+using MyCmsWebApi2.Applications.MessageServices;
 using MyCmsWebApi2.Applications.Repository;
 using MyCmsWebApi2.Domain.Entities;
 using MyCmsWebApi2.Infrastructure.Extensions;
+using MyCmsWebApi2.Infrastructure.HostedServices;
 using MyCmsWebApi2.Infrastructure.Middlewares;
 using MyCmsWebApi2.Persistences.EF;
 using MyCmsWebApi2.Persistences.QueryFacade;
@@ -15,9 +19,7 @@ using MyCmsWebApi2.Presentations.Validator.Image;
 using Serilog;
 using System.Reflection;
 using System.Text;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.OpenApi.Models;
-using MyCmsWebApi2.Infrastructure.HostedServices;
+using MyCmsWebApi2.Persistences;
 
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Debug()
@@ -32,6 +34,7 @@ var configurationBuilder = new ConfigurationBuilder()
     .SetBasePath(builder.Environment.ContentRootPath)
     .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
 var configuration = configurationBuilder.Build();
+
 var connectionString = configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<CmsDbContext>(options => options.UseSqlServer(connectionString));
 
@@ -71,7 +74,7 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddMemoryCache();
 builder.Services.AddScoped<JwtTokenGenerator>();
 builder.Services.AddScoped<TokenValidationParameters> ();
-
+builder.Services.AddScoped<IMessageProducer, MessageProducer>();
 
 #region Repository
 builder.Services.AddScoped<ICommentRepository, CommentRepository>();
@@ -167,9 +170,10 @@ builder.Services.AddFluentValidationClientsideAdapters();
 builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 //builder.Services.AddScoped<IValidator<AdminAddImageDto>, AdminAddImageValidator>();
 builder.Services.AddControllers()
-    .AddFluentValidation(x => x.RegisterValidatorsFromAssemblyContaining<AdminAddImageValidator>());
+    ?.AddFluentValidation(x => x.RegisterValidatorsFromAssemblyContaining<AdminAddImageValidator>());
 
 #endregion
+
 
 
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));

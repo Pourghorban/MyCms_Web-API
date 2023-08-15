@@ -4,9 +4,7 @@ using CMSShared.Infrastructures;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using MyCmsWebApi2.Persistences.EF;
-using MyCmsWebApi2.Presentations.Dtos.CommentsDto.Admin;
 using MyCmsWebApi2.Presentations.Dtos.NewsDto;
-using MyCmsWebApi2.Presentations.Dtos.NewsDto.Admin;
 using MyCmsWebApi2.Presentations.Dtos.NewsDto.Users;
 using MyCmsWebApi2.Presentations.QueryFacade;
 
@@ -28,7 +26,8 @@ namespace MyCmsWebApi2.Persistences.QueryFacade
 
         public async Task<IEnumerable<AdminNewsDto>> AdminGetAllNews()
         {
-            return await _context.News.AsNoTracking().Include(x => x.Images).ProjectTo<AdminNewsDto>(_mapper.ConfigurationProvider).ToListAsync();
+            return await _context.News.AsNoTracking().Include(x => x.Images).
+                ProjectTo<AdminNewsDto>(_mapper.ConfigurationProvider).ToListAsync();
 
         }
 
@@ -40,23 +39,27 @@ namespace MyCmsWebApi2.Persistences.QueryFacade
 
         public async Task<IEnumerable<AdminNewsDto>> AdminGetNewsByGroupId(int id)
         {
-            return await _context.News.AsNoTracking().Include(x => x.Images).Where(x => x.NewsGroupId == id).ProjectTo<AdminNewsDto>(_mapper.ConfigurationProvider).ToListAsync();
+            return await _context.News.AsNoTracking().Include(x => x.Images).
+                Where(x => x.NewsGroupId == id).ProjectTo<AdminNewsDto>(_mapper.ConfigurationProvider).ToListAsync();
 
         }
         public async Task<IEnumerable<UserNewsDto>> UserGetNewsByGroupId(int id)
         {
-            return await _context.News.AsNoTracking().Include(x => x.Images).Where(x => x.NewsGroupId == id).ProjectTo<UserNewsDto>(_mapper.ConfigurationProvider).ToListAsync();
+            return await _context.News.AsNoTracking().Include(x => x.Images).
+                Where(x => x.NewsGroupId == id).ProjectTo<UserNewsDto>(_mapper.ConfigurationProvider).ToListAsync();
 
         }
 
         public async Task<AdminNewsDto> AdminGetNewsById(int id)
         {
-            return await _context.News.AsNoTracking().Include(x => x.Images).ProjectTo<AdminNewsDto>(_mapper.ConfigurationProvider).FirstOrDefaultAsync(x => x.Id == id);
+            return await _context.News.AsNoTracking().Include(x => x.Images).
+                ProjectTo<AdminNewsDto>(_mapper.ConfigurationProvider).FirstOrDefaultAsync(x => x.Id == id);
 
         }
         public async Task<UserNewsDto> UserGetNewsById(int id)
         {
-            return await _context.News.AsNoTracking().Include(x => x.Images).ProjectTo<UserNewsDto>(_mapper.ConfigurationProvider).FirstOrDefaultAsync(x => x.Id == id);
+            return await _context.News.AsNoTracking().Include(x => x.Images).
+                ProjectTo<UserNewsDto>(_mapper.ConfigurationProvider).FirstOrDefaultAsync(x => x.Id == id);
 
         }
 
@@ -71,11 +74,11 @@ namespace MyCmsWebApi2.Persistences.QueryFacade
             var topNews = await _memoryCache.GetOrCreateAsync(CacheKeys.GetTopNewsKeys(), async entry =>
             {
                 DateTime yesterday = DateTime.Today.AddDays(-1);
-                const double CommentScore = 1;
-                const double VisitScore = 3;
+                const double commentScore = 1;
+                const double visitScore = 3;
                 var news = await _context.News
                     .Where(n => n.CreateDate >= yesterday)
-                    .OrderByDescending(n => VisitScore * n.Visit + CommentScore * n.Comments.Count)
+                    .OrderByDescending(n => visitScore * n.Visit + commentScore * n.Comments.Count)
                     .Take(10)
                     .ToListAsync();
                 var topNewsDto = _mapper.Map<List<TopNewsDto>>(news);

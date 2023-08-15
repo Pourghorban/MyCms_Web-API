@@ -38,7 +38,6 @@ public class NewsMap : IEntityTypeConfiguration<News>
             .HasMaxLength(300);
 
 
-
         builder.HasOne(p => p.NewsGroup)
             .WithMany(p => p.News)
             .HasForeignKey(p => p.NewsGroupId)

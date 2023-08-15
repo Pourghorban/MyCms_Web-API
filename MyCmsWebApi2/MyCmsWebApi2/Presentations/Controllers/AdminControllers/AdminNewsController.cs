@@ -12,6 +12,7 @@ using Microsoft.Extensions.Caching.Memory;
 using MyCmsWebApi2.Infrastructure.Extensions;
 using MyCmsWebApi2.Applications.Commands.NewsCommand;
 using Microsoft.AspNetCore.Authorization;
+using MyCmsWebApi2.Applications.MessageServices;
 
 namespace MyCmsWebApi2.Presentations.Controllers.AdminControllers
 {
@@ -30,9 +31,11 @@ namespace MyCmsWebApi2.Presentations.Controllers.AdminControllers
         private readonly INewsQueryFacade _newsQueryFacade;
         private readonly IMediator _mediator;
         private readonly ICommentQueryFacade _commentQueryFacade;
-        private readonly IMemoryCache _memoryCache;
+        private readonly IMessageProducer _messageProducer;
+
+
         public AdminNewsController(INewsRepository newsRepository, IMapper mapper, ILogger<AdminNewsController> logger, ICommentRepository commentRepository,
-            INewsGroupRepository newsGroupRepository, INewsQueryFacade newsQueryFacade, IMediator mediator, ICommentQueryFacade commentQueryFacade, IMemoryCache memoryCache)
+            INewsGroupRepository newsGroupRepository, INewsQueryFacade newsQueryFacade, IMediator mediator, ICommentQueryFacade commentQueryFacade, IMemoryCache memoryCache, IMessageProducer messageProducer)
         {
             _newsRepository = newsRepository ?? throw new ArgumentNullException(nameof(newsRepository));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
@@ -42,7 +45,7 @@ namespace MyCmsWebApi2.Presentations.Controllers.AdminControllers
             _newsQueryFacade = newsQueryFacade;
             _mediator = mediator;
             _commentQueryFacade = commentQueryFacade;
-            _memoryCache = memoryCache;
+            _messageProducer = messageProducer;
         }
 
         [HttpGet]
@@ -73,6 +76,7 @@ namespace MyCmsWebApi2.Presentations.Controllers.AdminControllers
             }
             await _mediator.Publish(new AddNewsVisitNotification() { NewsId = id });
             return Ok(result);
+            Console.WriteLine("hello world");
 
         }
 
@@ -132,5 +136,6 @@ namespace MyCmsWebApi2.Presentations.Controllers.AdminControllers
             return Ok(new SingleValue<int>(result));
 
         }
+        
     }
 }
